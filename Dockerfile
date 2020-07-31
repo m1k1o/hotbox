@@ -3,102 +3,119 @@
 # http://blog.obscuritylabs.com/
 # http://cybersyndicates.org
 
-FROM kalilinux/kali-linux-docker
+FROM kalilinux/kali
+
+WORKDIR /root/
 
 # Referenced: https://hub.docker.com/r/v00d00sec/kali-mini
 # Referenced: https://github.com/v00d00sec/kali-minimal-dockerfile
 # Referenced: https://github.com/attify/firmware-analysis-toolkit
 
-# Setup Kali and FAT Tools
-RUN apt-get update && apt-get install -y apt-transport-https
-RUN cd /tmp && mkdir docker_tmp && cd docker_tmp
-RUN cd /root/ 
-RUN apt-get install -y apt bc gettext-base man-db fontconfig powerline
-RUN apt-get install -y nmap hydra john tcpdump metasploit-framework sqlmap fierce dnsrecon dirb python-pip git nginx sslscan dnsenum dnsmap p0f joomscan davtest wfuzz sipvicious sslstrip gpp-decrypt patator wordlists enum4linux onesixtyone apktool dex2jar smali ridenum jad webshells snmpcheck dnsutils rsh-client gdb git exploitdb vim gnuradio gqrx-sdr hackrf tree locate default-jre busybox-static fakeroot kpartx netcat-openbsd python-psycopg2 python3-psycopg2 snmp uml-utilities util-linux vlan qemu-system-arm qemu-system-mips qemu-system-x86 qemu-utils build-essential zlib1g-dev liblzma-dev python-magic python-gtk2 python-cairo python-usb python-crypto python-serial python-dev libgcrypt-dev python-pip python-scapy gdb-multiarch x11vnc xvfb iceweasel mitmproxy binwalk ltrace strace
-RUN updatedb
+RUN set -eux; apt-get update; \
+	apt-get -y install apt-transport-https; \
+	apt-get -y install \
+		apt bc gettext-base man-db fontconfig powerline \
+		nmap hydra john tcpdump metasploit-framework \
+		sqlmap fierce dnsrecon dirb python-pip git \
+		nginx sslscan dnsenum dnsmap p0f joomscan \
+		davtest wfuzz sipvicious gpp-decrypt \
+		patator wordlists enum4linux onesixtyone apktool \
+		dex2jar smali ridenum webshells snmpcheck \
+		dnsutils rsh-client gdb git exploitdb vim gnuradio \
+		gqrx-sdr hackrf tree locate default-jre busybox-static \
+		fakeroot kpartx netcat-openbsd \
+		python3-psycopg2 snmp uml-utilities util-linux vlan \
+		qemu-system-arm qemu-system-mips qemu-system-x86 qemu-utils \
+		build-essential zlib1g-dev liblzma-dev \
+		python-gtk2 python-cairo python-usb python-crypto \
+		python-serial python-dev libgcrypt-dev python-pip \
+		python-scapy gdb-multiarch x11vnc xvfb iceweasel \
+		# Todo: Replace
+		#sslstrip jad python-psycopg2 python-magic \
+		mitmproxy binwalk ltrace strace; \
+	mkdir /tmp/docker_tmp; \
+	updatedb; \
+	#
+	# git clone additional tools
+	git clone --depth=1 --recursive https://github.com/attify/firmware-analysis-toolkit ./firmware-analysis-toolkit/; \
+      rm -rf ./firmware-analysis-toolkit/firmadyne; \
+      rm -rf ./firmware-analysis-toolkit/firmwalker; \
+      rm -rf ./firmware-analysis-toolkit/firmware-mod-kit; \
+    git clone --depth=1 --recursive https://github.com/zcutlip/nvram-faker.git ./firmware-analysis-toolkit/nvram-faker; \
+    git clone --depth=1 --recursive https://github.com/firmadyne/firmadyne ./firmware-analysis-toolkit/firmadyne; \
+    git clone --depth=1 --recursive https://github.com/craigz28/firmwalker ./firmware-analysis-toolkit/firmwalker; \
+    git clone --depth=1 --recursive https://github.com/mirror/firmware-mod-kit ./firmware-analysis-toolkit/firmware-mod-kit; \
+    git clone --depth=1 --recursive https://github.com/JonathanSalwan/ROPgadget.git ./firmware-analysis-toolkit/ROPgadget; \
+    git clone --depth=1 --recursive https://github.com/hugsy/gef ./firmware-analysis-toolkit/gef; \
+    git clone --depth=1 --recursive https://github.com/longld/peda.git ./firmware-analysis-toolkit/peda; \
+    git clone --depth=1 --recursive https://github.com/719Ben/baudrate.py ./firmware-analysis-toolkit/baudrate/; \
+    git clone --depth=1 --recursive https://github.com/andresriancho/w3af.git ./w3af; \
+    git clone --depth=1 --recursive https://github.com/x893/BusPirateConsole ./BusPirateConsole; \
+    git clone --depth=1 --recursive https://github.com/cyphunk/JTAGenum ./JTAGenum; \
+    git clone --depth=1 --recursive https://github.com/attify/attify-badge ./attify-badge; \
+    git clone --depth=1 --recursive https://github.com/attify/Attify-Zigbee-Framework ./Attify-Zigbee-Framework; \
+    git clone --depth=1 --recursive https://github.com/pwnieexpress/blue_hydra ./blue_hydra; \
+    git clone --depth=1 --recursive https://github.com/buildroot/buildroot ./buildroot; \
+    git clone --depth=1 --recursive https://github.com/KJCracks/Clutch ./Clutch; \
+    git clone --depth=1 --recursive https://github.com/jeremylong/DependencyCheck ./DependencyCheck; \
+    git clone --depth=1 --recursive https://github.com/stefanesser/dumpdecrypted ./dumpdecrypted; \
+    git clone --depth=1 --recursive https://github.com/praetorian-inc/DVRF ./DVRF; \
+    git clone --depth=1 --recursive https://github.com/google/enjarify ./enjarify; \
+    git clone --depth=1 --recursive https://github.com/cureHsu/EZ-Wave ./EZ-Wave; \
+    git clone --depth=1 --recursive https://github.com/ptrkrysik/gr-gsm ./gr-gsm; \
+    git clone --depth=1 --recursive https://github.com/skylot/jadx ./jadx; \
+    git clone --depth=1 --recursive https://github.com/java-decompiler/jd-gui ./jd-gui; \
+    git clone --depth=1 --recursive https://github.com/sviehb/jefferson ./jefferson; \
+    git clone --depth=1 --recursive https://github.com/grandideastudio/jtagulator ./jtagulator; \
+    git clone --depth=1 --recursive https://github.com/ttsou/kalibrate ./kalibrate; \
+    git clone --depth=1 --recursive https://github.com/steve-m/kalibrate-rtl ./kalibrate-rtl; \
+    git clone --depth=1 --recursive https://github.com/scateu/kalibrate-hackrf ./kalibrate-hackrf; \
+    git clone --depth=1 --recursive https://github.com/Nuand/kalibrate-bladeRF ./kalibrate-bladeRF; \
+    git clone --depth=1 --recursive https://github.com/riverloopsec/killerbee ./killerbee; \
+    git clone --depth=1 --recursive https://github.com/greatscottgadgets/libbtbb ./libbtbb; \
+    git clone --depth=1 --recursive https://github.com/devttys0/libmpsse ./libmpsse; \
+    git clone --depth=1 --recursive https://github.com/DanBeard/LibScanner ./LibScanner; \
+    git clone --depth=1 --recursive https://github.com/CISOfy/lynis ./lynis; \
+    git clone --depth=1 --recursive https://github.com/MobSF/Mobile-Security-Framework-MobSF ./Mobile-Security-Framework-MobSF; \
+    git clone --depth=1 --recursive https://github.com/blasty/moneyshot ./moneyshot; \
+    git clone --depth=1 --recursive https://github.com/nodesecurity/nsp ./nsp; \
+    git clone --depth=1 --recursive https://github.com/gnu-mcu-eclipse/openocd ./openocd; \
+    git clone --depth=1 --recursive https://github.com/radare/radare2 ./radare2; \
+    git clone --depth=1 --recursive https://github.com/RetireJS/retire.js ./retire.js; \
+    git clone --depth=1 --recursive https://github.com/sqlcipher/sqlcipher ./sqlcipher; \
+    git clone --depth=1 --recursive https://github.com/theupdateframework/tuf ./tuf; \
+    git clone --depth=1 --recursive https://github.com/greatscottgadgets/ubertooth ./ubertooth; \
+    git clone --depth=1 --recursive https://github.com/uptane/uptane ./uptane; \
+    git clone --depth=1 --recursive https://github.com/jopohl/urh ./urh; \
+    git clone --depth=1 --recursive https://github.com/osqzss/gps-sdr-sim ./gps-sdr-sim; \
+    git clone --depth=1 --recursive https://github.com/Oros42/IMSI-catcher ./IMSI-catcher; \
+    git clone --depth=1 --recursive https://github.com/cn0xroot/RFSec-ToolKit ./RFSec-ToolKit; \
+    git clone --depth=1 --recursive https://github.com/xmikos/qspectrumanalyzer ./qspectrumanalyzer; \
+    git clone --depth=1 --recursive https://github.com/hathcox/py-hackrf ./py-hackrf; \
+    git clone --depth=1 --recursive https://github.com/realraum/hackrf-dvb-t ./hackrf-dvb-t; \
+    git clone --depth=1 --recursive https://github.com/f4exb/sdrangel ./sdrangel; \
+    git clone --depth=1 --recursive https://github.com/h3xstream/burp-retire-js ./burp-retire-js; \
+    git clone --depth=1 --recursive https://github.com/mirrorer/afl ./afl; \
+    git clone --depth=1 --recursive https://github.com/rmadair/fuzzer ./rmadair; \
+    git clone --depth=1 --recursive https://github.com/samhocevar/zzuf ./zzuf; \
+    git clone --depth=1 --recursive https://github.com/aoh/radamsa ./radamsa; \
+    git clone --depth=1 --recursive https://github.com/binspector/binspector ./binspector; \
+    git clone --depth=1 --recursive https://github.com/renatahodovan/grammarinator ./grammarinator; \
+    git clone --depth=1 --recursive https://github.com/jtpereyda/boofuzz ./boofuzz; \
+    #
+	# install and configure additional tools
+	./firmware-analysis-toolkit/binwalk/deps.sh --yes; \
+	#BROKE: python ./firmware-analysis-toolkit/binwalk/setup.py install; \
+	pip install capstone unicorn keystone-engine pexpect; \
+	chmod +x ./firmware-analysis-toolkit/fat.py; \
+	chmod +x ./firmware-analysis-toolkit/reset.py; \
+	sed -i -e 's/\/home\/vagrant\/firmadyne\//\/root\/firmware-analysis-toolkit\/firmadyne\//g' ./firmware-analysis-toolkit/firmadyne/firmadyne.config; \
+	echo "root:root" | chgpasswd; \
+	sed -i -e 's/\/home\/ec\/firmadyne/\/root\/firmware-analysis-toolkit\/firmadyne/g' ./firmware-analysis-toolkit/fat.py; \
+	sed -i -e 's/\.\/src\/binwalk\/src\/scripts\/binwalk/\/usr\/local\/bin\/binwalk/g' ./firmware-analysis-toolkit/firmware-mod-kit/shared-ng.inc
 
-# Git Clone Additional Tools
-RUN git clone --recursive https://github.com/attify/firmware-analysis-toolkit /root/firmware-analysis-toolkit/
-RUN rm -rf /root/firmware-analysis-toolkit/firmadyne
-RUN rm -rf /root/firmware-analysis-toolkit/firmwalker
-RUN rm -rf /root/firmware-analysis-toolkit/firmware-mod-kit
-RUN git clone --recursive https://github.com/zcutlip/nvram-faker.git /root/firmware-analysis-toolkit/nvram-faker
-RUN git clone --recursive https://github.com/firmadyne/firmadyne /root/firmware-analysis-toolkit/firmadyne
-RUN git clone --recursive https://github.com/craigz28/firmwalker /root/firmware-analysis-toolkit/firmwalker
-RUN git clone --recursive https://github.com/mirror/firmware-mod-kit /root/firmware-analysis-toolkit/firmware-mod-kit
-RUN git clone --recursive https://github.com/JonathanSalwan/ROPgadget.git /root/firmware-analysis-toolkit/ROPgadget
-RUN git clone --recursive https://github.com/hugsy/gef /root/firmware-analysis-toolkit/gef
-RUN git clone --recursive https://github.com/longld/peda.git /root/firmware-analysis-toolkit/peda
-RUN git clone --recursive https://github.com/719Ben/baudrate.py /root/firmware-analysis-toolkit/baudrate/
-RUN git clone --recursive https://github.com/andresriancho/w3af.git /root/w3af
-RUN git clone --recursive https://github.com/x893/BusPirateConsole /root/BusPirateConsole
-RUN git clone --recursive https://github.com/cyphunk/JTAGenum /root/JTAGenum
-RUN git clone --recursive https://github.com/attify/attify-badge /root/attify-badge
-RUN git clone --recursive https://github.com/attify/Attify-Zigbee-Framework /root/Attify-Zigbee-Framework
-RUN git clone --recursive https://github.com/pwnieexpress/blue_hydra /root/blue_hydra
-RUN git clone --recursive https://github.com/buildroot/buildroot /root/buildroot
-RUN git clone --recursive https://github.com/KJCracks/Clutch /root/Clutch
-RUN git clone --recursive https://github.com/jeremylong/DependencyCheck /root/DependencyCheck
-RUN git clone --recursive https://github.com/stefanesser/dumpdecrypted /root/dumpdecrypted
-RUN git clone --recursive https://github.com/praetorian-inc/DVRF /root/DVRF
-RUN git clone --recursive https://github.com/google/enjarify /root/enjarify
-RUN git clone --recursive https://github.com/cureHsu/EZ-Wave /root/EZ-Wave
-RUN git clone --recursive https://github.com/ptrkrysik/gr-gsm /root/gr-gsm
-RUN git clone --recursive https://github.com/skylot/jadx /root/jadx
-RUN git clone --recursive https://github.com/java-decompiler/jd-gui /root/jd-gui
-RUN git clone --recursive https://github.com/sviehb/jefferson /root/jefferson
-RUN git clone --recursive https://github.com/grandideastudio/jtagulator /root/jtagulator
-RUN git clone --recursive https://github.com/ttsou/kalibrate /root/kalibrate
-RUN git clone --recursive https://github.com/steve-m/kalibrate-rtl /root/kalibrate-rtl
-RUN git clone --recursive https://github.com/scateu/kalibrate-hackrf /root/kalibrate-hackrf
-RUN git clone --recursive https://github.com/Nuand/kalibrate-bladeRF /root/kalibrate-bladeRF
-RUN git clone --recursive https://github.com/riverloopsec/killerbee /root/killerbee
-RUN git clone --recursive https://github.com/greatscottgadgets/libbtbb /root/libbtbb
-RUN git clone --recursive https://github.com/devttys0/libmpsse /root/libmpsse
-RUN git clone --recursive https://github.com/DanBeard/LibScanner /root/LibScanner
-RUN git clone --recursive https://github.com/CISOfy/lynis /root/lynis
-RUN git clone --recursive https://github.com/MobSF/Mobile-Security-Framework-MobSF /root/Mobile-Security-Framework-MobSF
-RUN git clone --recursive https://github.com/blasty/moneyshot /root/moneyshot
-RUN git clone --recursive https://github.com/nodesecurity/nsp /root/nsp
-RUN git clone --recursive https://github.com/gnu-mcu-eclipse/openocd /root/openocd
-RUN git clone --recursive https://github.com/radare/radare2 /root/radare2
-RUN git clone --recursive https://github.com/RetireJS/retire.js /root/retire.js
-RUN git clone --recursive https://github.com/sqlcipher/sqlcipher /root/sqlcipher
-RUN git clone --recursive https://github.com/theupdateframework/tuf /root/tuf
-RUN git clone --recursive https://github.com/greatscottgadgets/ubertooth /root/ubertooth
-RUN git clone --recursive https://github.com/uptane/uptane /root/uptane
-RUN git clone --recursive https://github.com/jopohl/urh /root/urh
-RUN git clone --recursive https://github.com/osqzss/gps-sdr-sim /root/gps-sdr-sim
-RUN git clone --recursive https://github.com/Oros42/IMSI-catcher /root/IMSI-catcher
-RUN git clone --recursive https://github.com/cn0xroot/RFSec-ToolKit /root/RFSec-ToolKit
-RUN git clone --recursive https://github.com/xmikos/qspectrumanalyzer /root/qspectrumanalyzer
-RUN git clone --recursive https://github.com/hathcox/py-hackrf /root/py-hackrf
-RUN git clone --recursive https://github.com/realraum/hackrf-dvb-t /root/hackrf-dvb-t
-RUN git clone --recursive https://github.com/f4exb/sdrangel /root/sdrangel
-RUN git clone --recursive https://github.com/h3xstream/burp-retire-js /root/burp-retire-js
-RUN git clone --recursive https://github.com/mirrorer/afl /root/afl
-RUN git clone --recursive https://github.com/rmadair/fuzzer /root/rmadair
-RUN git clone --recursive https://github.com/samhocevar/zzuf /root/zzuf
-RUN git clone --recursive https://github.com/aoh/radamsa /root/radamsa
-RUN git clone --recursive https://github.com/binspector/binspector /root/binspector
-RUN git clone --recursive https://github.com/renatahodovan/grammarinator /root/grammarinator
-RUN git clone --recursive https://github.com/jtpereyda/boofuzz /root/boofuzz
-
-#Install and Configure Additional Tools 
-RUN /root/firmware-analysis-toolkit/binwalk/deps.sh --yes
-#BROKE: RUN python /root/firmware-analysis-toolkit/binwalk/setup.py install
-RUN pip install capstone unicorn keystone-engine pexpect
-RUN chmod +x /root/firmware-analysis-toolkit/fat.py
-RUN chmod +x /root/firmware-analysis-toolkit/reset.py
-RUN sed -i -e 's/\/home\/vagrant\/firmadyne\//\/root\/firmware-analysis-toolkit\/firmadyne\//g' /root/firmware-analysis-toolkit/firmadyne/firmadyne.config
-RUN echo "root:root" | chgpasswd
-RUN sed -i -e 's/\/home\/ec\/firmadyne/\/root\/firmware-analysis-toolkit\/firmadyne/g' /root/firmware-analysis-toolkit/fat.py
-RUN sed -i -e 's/\.\/src\/binwalk\/src\/scripts\/binwalk/\/usr\/local\/bin\/binwalk/g' /root/firmware-analysis-toolkit/firmware-mod-kit/shared-ng.inc
-
-# Define default command if required, eg:
-# CMD ["nginx -g 'daemon off;'"]
-CMD cd /root/
-# Ports to be exposed
+#
+# ports to be exposed
 EXPOSE 53
 EXPOSE 80
 EXPOSE 443
